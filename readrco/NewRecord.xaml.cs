@@ -43,5 +43,57 @@ namespace readrco
 
 			SPAuthors.Children.Add(tbox);
 		}
+
+		private void Add_Translator(object sender, RoutedEventArgs e)
+		{
+			Logger.v(TAG, "Add_Translator()");
+			SPTranslators.Children.Add(GenRemovableTextBox());
+		}
+
+		private void Remove_UIElement_Click(object sender, MouseButtonEventArgs e)
+		{
+			Logger.v(TAG, "Remove_UIElement_Click()," + e.ChangedButton + ",sender:" + sender);
+
+			if(sender is Image)
+			{
+				Image img = sender as Image;
+				
+			}
+		}
+
+		private StackPanel GenRemovableTextBox()
+		{
+			StackPanel panel = new StackPanel();
+			panel.Orientation = Orientation.Horizontal;
+			panel.Margin = new Thickness
+			{
+				Top = 5
+			};
+
+			TextBox tbox = new TextBox
+			{
+				Style = (Style)Resources["AddableTextBoxWidth"]
+			};
+
+			BitmapImage bimg = new BitmapImage();
+			bimg.BeginInit();
+			bimg.UriSource = new Uri(@"res/minus.png", UriKind.Relative);
+			bimg.EndInit();
+			Image img = new Image
+			{
+				Width = 18,
+				Margin = new Thickness
+				{
+					Left = 5
+				},
+				Source = bimg
+			};
+			img.MouseDown += Remove_UIElement_Click;
+			
+			panel.Children.Add(tbox);
+			panel.Children.Add(img);
+
+			return panel;
+		}
 	}
 }

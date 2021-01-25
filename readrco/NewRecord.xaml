@@ -7,12 +7,19 @@
         mc:Ignorable="d"
 		SizeToContent="Height"
         Title="NewRecord" Width="500">
-    <DockPanel>
+
+	<Window.Resources>
+		<Style x:Key="AddableTextBoxWidth" TargetType="TextBox">
+			<Setter Property="Width" Value="160" />
+		</Style>
+	</Window.Resources>
+
+	<DockPanel>
 		<StackPanel Orientation="Vertical" Background="AliceBlue">
 			<Grid Margin="10" >
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="90" />
-					<ColumnDefinition Width="300"/>
+					<ColumnDefinition Width="200"/>
 				</Grid.ColumnDefinitions>
 
 				<Grid.RowDefinitions>
@@ -30,7 +37,7 @@
 
 				<!-- row1 -->
 				<TextBlock Text="主标题：" Grid.Column="0" HorizontalAlignment="Right" />
-				<TextBox x:Name="TBMainTitle" Grid.Column="1" />
+				<TextBox x:Name="TBMainTitle" Grid.Column="1" MaxLength="10" />
 
 				<!-- row2 -->
 				<TextBlock Text="副标题：" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
@@ -39,16 +46,19 @@
 				<!-- row3 -->
 				<TextBlock Text="作者：" Grid.Row="2" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<StackPanel x:Name="SPAuthors" Orientation="Vertical" Grid.Row="2" Grid.Column="1" Margin="0, 5, 0, 0" >
-					<StackPanel Width="300" Orientation="Horizontal">
-						<TextBox Width="200" Text="123" />
+					<StackPanel Orientation="Horizontal">
+						<TextBox Style="{StaticResource AddableTextBoxWidth}" />
 						<Image Source="res/add.png" Width="18" Margin="5, 0, 0, 0" MouseDown="Add_Author" />
 					</StackPanel>
 				</StackPanel>
 				
 				<!-- row4 -->
 				<TextBlock Text="译者：" Grid.Row="3" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
-				<StackPanel Orientation="Vertical" Grid.Row="3" Grid.Column="1" Margin="0, 5, 0, 0" >
-					<TextBox Width="300" />
+				<StackPanel x:Name="SPTranslators" Orientation="Vertical" Grid.Row="3" Grid.Column="1" Margin="0, 5, 0, 0" >
+					<StackPanel Orientation="Horizontal">
+						<TextBox Style="{StaticResource AddableTextBoxWidth}" />
+						<Image Source="res/add.png" Width="18" Margin="5, 0, 0, 0" MouseDown="Add_Translator" />
+					</StackPanel>
 				</StackPanel>
 				
 				<!-- row5 -->
