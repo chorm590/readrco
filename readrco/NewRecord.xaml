@@ -9,14 +9,14 @@
         Title="NewRecord" Width="500">
 
 	<Window.Resources>
-		<Style x:Key="AddableTextBoxWidth" TargetType="TextBox">
+		<Style x:Key="NarrowTextBoxWidth" TargetType="TextBox">
 			<Setter Property="Width" Value="160" />
 		</Style>
 	</Window.Resources>
 
-	<DockPanel>
-		<StackPanel Orientation="Vertical" Background="AliceBlue">
-			<Grid Margin="10" >
+	<StackPanel x:Name="SPMain" Orientation="Vertical" Background="AliceBlue">
+		<StackPanel Orientation="Horizontal" Margin="10">
+			<Grid >
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="90" />
 					<ColumnDefinition Width="200"/>
@@ -47,20 +47,20 @@
 				<TextBlock Text="作者：" Grid.Row="2" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<StackPanel x:Name="SPAuthors" Orientation="Vertical" Grid.Row="2" Grid.Column="1" Margin="0, 5, 0, 0" >
 					<StackPanel Orientation="Horizontal">
-						<TextBox Style="{StaticResource AddableTextBoxWidth}" />
+						<TextBox Style="{StaticResource NarrowTextBoxWidth}" />
 						<Image Source="res/add.png" Width="18" Margin="5, 0, 0, 0" MouseDown="Add_Author" />
 					</StackPanel>
 				</StackPanel>
-				
+
 				<!-- row4 -->
 				<TextBlock Text="译者：" Grid.Row="3" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<StackPanel x:Name="SPTranslators" Orientation="Vertical" Grid.Row="3" Grid.Column="1" Margin="0, 5, 0, 0" >
 					<StackPanel Orientation="Horizontal">
-						<TextBox Style="{StaticResource AddableTextBoxWidth}" />
+						<TextBox Style="{StaticResource NarrowTextBoxWidth}" />
 						<Image Source="res/add.png" Width="18" Margin="5, 0, 0, 0" MouseDown="Add_Translator" />
 					</StackPanel>
 				</StackPanel>
-				
+
 				<!-- row5 -->
 				<TextBlock Text="出版社：" Grid.Row="4" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<TextBox x:Name="TBPublish" Grid.Row="4" Grid.Column="1" Margin="0, 5, 0, 0" />
@@ -71,7 +71,10 @@
 
 				<!-- row7 -->
 				<TextBlock Text="字数：" Grid.Row="6" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
-				<TextBox x:Name="TBWords" Grid.Row="6" Grid.Column="1" Margin="0, 5, 0, 0" />
+				<StackPanel Grid.Row="6" Grid.Column="1" Margin="0, 5, 0, 0" Orientation="Horizontal" >
+					<TextBox x:Name="TBWords" InputScope="Number" Style="{StaticResource NarrowTextBoxWidth}" HorizontalAlignment="Left" />
+					<TextBlock Text=" (千字)" FontSize="11" VerticalAlignment="Center" />
+				</StackPanel>
 
 				<!-- row8 -->
 				<TextBlock Text="起始阅读日期：" Grid.Row="7" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
@@ -80,7 +83,7 @@
 				<!-- row9 -->
 				<TextBlock Text="终止阅读日期：" Grid.Row="8" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<TextBox x:Name="TBEndDate" Grid.Row="8" Grid.Column="1" Margin="0, 5, 0, 0" />
-				
+
 				<!-- row10 -->
 				<StackPanel Orientation="Horizontal" Grid.Row="9" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
 					<RadioButton GroupName="read_status" Checked="Read_Status_Watcher">正在读</RadioButton>
@@ -88,35 +91,51 @@
 				</StackPanel>
 			</Grid>
 
-			<!-- 已读完时的评分信息栏 -->
-			<GroupBox x:Name="GBStar" Header="评价" Width="400" HorizontalAlignment="Left" Margin="20, 0, 0, 0">
-				<Grid>
+			<GroupBox Header="常用字符" Margin="20, 0, 10, 10" Width="100" Height="70" VerticalAlignment="Top">
+				<Grid Margin="5">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="90"/>
+						<ColumnDefinition />
+						<ColumnDefinition />
 						<ColumnDefinition />
 					</Grid.ColumnDefinitions>
 					<Grid.RowDefinitions>
-						<RowDefinition />
-						<RowDefinition />
+						<RowDefinition Height="25" />
 					</Grid.RowDefinitions>
 
-					<!-- row1 -->
-					<TextBlock Text="评分：" Grid.Row="0" HorizontalAlignment="Right" />
-					<ComboBox Name="CBStart" Grid.Column="1" Width="70" HorizontalAlignment="Left" >
-						<ComboBoxItem>1分</ComboBoxItem>
-						<ComboBoxItem>2分</ComboBoxItem>
-						<ComboBoxItem>3分</ComboBoxItem>
-						<ComboBoxItem>4分</ComboBoxItem>
-						<ComboBoxItem>5分</ComboBoxItem>
-					</ComboBox>
-					
-					<!-- row2 -->
-					<TextBlock Text="短评：" Grid.Row="1" HorizontalAlignment="Right" Margin="0, 10, 0, 0" />
-					<TextBox Grid.Row="1" Grid.Column="1" Width="250" Height="40" HorizontalAlignment="Left" MaxWidth="250" TextWrapping="Wrap" Margin="0, 10, 0, 0" />
+					<TextBlock Text=" • " Background="White" TextAlignment="Center" MouseDown="HighFrqCharacter_Click" />
 				</Grid>
 			</GroupBox>
-
-			<Button x:Name="BtnSave" Content="保存" Width="70" Margin="0, 20, 0, 20" />
 		</StackPanel>
-	</DockPanel>
+		
+
+		<!-- 已读完时的评分信息栏 -->
+		<GroupBox x:Name="GBStar" Header="评价" Width="400" HorizontalAlignment="Left" Margin="20, 0, 0, 0" >
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="90"/>
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition />
+					<RowDefinition />
+				</Grid.RowDefinitions>
+
+				<!-- row1 -->
+				<TextBlock Text="评分：" Grid.Row="0" HorizontalAlignment="Right" />
+				<ComboBox Name="CBStart" Grid.Column="1" Width="70" HorizontalAlignment="Left" >
+					<ComboBoxItem>1分</ComboBoxItem>
+					<ComboBoxItem>2分</ComboBoxItem>
+					<ComboBoxItem>3分</ComboBoxItem>
+					<ComboBoxItem>4分</ComboBoxItem>
+					<ComboBoxItem>5分</ComboBoxItem>
+				</ComboBox>
+					
+				<!-- row2 -->
+				<TextBlock Text="短评：" Grid.Row="1" HorizontalAlignment="Right" Margin="0, 10, 0, 0" />
+				<TextBox Grid.Row="1" Grid.Column="1" Width="250" Height="40" HorizontalAlignment="Left" MaxWidth="250" TextWrapping="Wrap" Margin="0, 10, 0, 0" />
+			</Grid>
+		</GroupBox>
+
+		<Button x:Name="BtnSave" Content="保存" Width="70" Margin="0, 20, 0, 20" />
+	</StackPanel>
 </Window>
