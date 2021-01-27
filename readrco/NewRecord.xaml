@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:readrco"
         mc:Ignorable="d"
 		SizeToContent="Height"
-        Title="NewRecord" Width="500">
+        Title="NewRecord" Width="450">
 
 	<Window.Resources>
 		<Style x:Key="NarrowTextBoxWidth" TargetType="TextBox">
@@ -77,17 +77,17 @@
 				</StackPanel>
 
 				<!-- row8 -->
-				<TextBlock Text="起始阅读日期：" Grid.Row="7" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
+				<TextBlock Text="起阅日期：" Grid.Row="7" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<TextBox x:Name="TBBeginDate" Grid.Row="7" Grid.Column="1" Margin="0, 5, 0, 0" />
 
 				<!-- row9 -->
-				<TextBlock Text="终止阅读日期：" Grid.Row="8" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
+				<TextBlock Text="终读日期：" Grid.Row="8" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<TextBox x:Name="TBEndDate" Grid.Row="8" Grid.Column="1" Margin="0, 5, 0, 0" />
 
 				<!-- row10 -->
 				<StackPanel Orientation="Horizontal" Grid.Row="9" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
-					<RadioButton GroupName="read_status" Checked="Read_Status_Watcher">正在读</RadioButton>
-					<RadioButton GroupName="read_status" Margin="20, 0, 0, 0" Checked="Read_Status_Watcher">已读完</RadioButton>
+					<RadioButton x:Name="RBReading" GroupName="read_status" Checked="Read_Status_Watcher">正在读</RadioButton>
+					<RadioButton x:Name="RBRead" GroupName="read_status" Margin="20, 0, 0, 0" Checked="Read_Status_Watcher">已读完</RadioButton>
 				</StackPanel>
 			</Grid>
 
@@ -102,7 +102,9 @@
 						<RowDefinition Height="25" />
 					</Grid.RowDefinitions>
 
-					<TextBlock Text=" • " Background="White" TextAlignment="Center" MouseDown="HighFrqCharacter_Click" />
+					<TextBlock Text=" • " Background="White" TextAlignment="Center" MouseDown="HighFrqCharacter_Click" Margin="3, 0, 0, 0" />
+					<TextBlock Text="『 " Grid.Column="1" Background="White" TextAlignment="Center" MouseDown="HighFrqCharacter_Click" Margin="3, 0, 0, 0" />
+					<TextBlock Text=" 』" Grid.Column="2" Background="White" TextAlignment="Center" MouseDown="HighFrqCharacter_Click" Margin="3, 0, 0, 0" />
 				</Grid>
 			</GroupBox>
 		</StackPanel>
@@ -136,6 +138,6 @@
 			</Grid>
 		</GroupBox>
 
-		<Button x:Name="BtnSave" Content="保存" Width="70" Margin="0, 20, 0, 20" />
+		<Button x:Name="BtnSave" Content="保存" Width="70" Margin="0, 20, 0, 20" Click="Save_Btn_Click" />
 	</StackPanel>
 </Window>

@@ -16,18 +16,21 @@ namespace readrco
 	{
 		private const string TAG = "NewRecord";
 
-
 		public NewRecord()
 		{
 			InitializeComponent();
-
-			GBStar.Visibility = Visibility.Collapsed;
-			
 		}
 
 		private void Read_Status_Watcher(object sender, RoutedEventArgs e)
 		{
-			Logger.v(TAG, "Read_Status_Watcher()");
+			if(sender == RBReading)
+			{
+				GBStar.Visibility = Visibility.Collapsed;
+			}
+			else if(sender == RBRead)
+			{
+				GBStar.Visibility = Visibility.Visible;
+			}
 		}
 
 		private void Add_Author(object sender, RoutedEventArgs e)
@@ -59,12 +62,8 @@ namespace readrco
 				TextBox tbox = GetFocusedTextBox();
 				if(tbox != null)
 				{
-					Logger.v(TAG, "found...");
 					tbox.AppendText(tb.Text.Trim());
-				}
-				else
-				{
-					Logger.v(TAG, "not found...");
+					tbox.SelectionStart = tbox.Text.Length;
 				}
 			}
 		}
@@ -161,6 +160,12 @@ namespace readrco
 			}
 
 			return null;
+		}
+
+		private void Save_Btn_Click(object sender, RoutedEventArgs e)
+		{
+			Logger.v(TAG, "Save_Btn_Click()");
+
 		}
 	}
 }
