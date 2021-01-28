@@ -35,7 +35,6 @@ namespace readrco
 
 		private void Btn_New_Click(object sender, RoutedEventArgs e)
 		{
-			Logger.v(TAG, "Newing book-read-record");
 			if(newRecordWindow != null)
 			{
 				newRecordWindow.Close();
@@ -43,6 +42,11 @@ namespace readrco
 
 			newRecordWindow = new NewRecord();
 			newRecordWindow.Show();
+		}
+
+		private void Btn_Edit_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

@@ -274,8 +274,7 @@ namespace readrco
 			{
 				book.WordCount = int.Parse(TBWords.Text);
 			}
-
-			/*
+			
 			XmlDocument xml = new XmlDocument();
 			xml.Load("records.xml");
 			XmlElement root = xml.DocumentElement;
@@ -288,9 +287,10 @@ namespace readrco
 			XmlText tmt = xml.CreateTextNode(book.MainTitle);
 			mainTitle.AppendChild(tmt);
 			bookk.AppendChild(mainTitle);
+			record.AppendChild(id);
+			record.AppendChild(bookk);
 			root.AppendChild(record);
 			xml.Save("records.xml");
-			*/
 		}
 
 		private (string[], byte) GetPersons(StackPanel panel)

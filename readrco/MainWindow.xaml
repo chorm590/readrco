@@ -7,7 +7,11 @@
         mc:Ignorable="d"
         Title="Book read record" Height="600" Width="950" ResizeMode="CanMinimize">  
     <DockPanel Margin="5" >
-		<Button DockPanel.Dock="Right" Content="New" Width="80" Height="30" Margin="3, 20, 0, 0" VerticalAlignment="Top" Click="Btn_New_Click" />
+		<StackPanel Width="80" Orientation="Vertical"  DockPanel.Dock="Right" Margin="10, 20, 5, 0">
+			<Button Content="New" Height="30" Click="Btn_New_Click" />
+			<Button Content="Edit" Height="30" Click="Btn_Edit_Click" Margin="0, 10, 0, 0"/>
+		</StackPanel>
+		
 		<ListView x:Name="LVList" >
 			<ListView.View>
 				<GridView>
