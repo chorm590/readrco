@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using readrco.src.tool;
+
 namespace readrco.src.model
 {
 	internal class Book
@@ -51,9 +53,9 @@ namespace readrco.src.model
 			set;
 		}
 
-		internal string[] GetAuthors()
+		internal (string[], byte) GetAuthors()
 		{
-			return authors;
+			return (authors, author_count);
 		}
 
 		/// <summary>
@@ -77,9 +79,9 @@ namespace readrco.src.model
 			}
 		}
 
-		internal string[] GetTranslators()
+		internal (string[], byte) GetTranslators()
 		{
-			return translators;
+			return (translators, translator_count);
 		}
 
 		internal void AddTranslator(string translator)
@@ -100,13 +102,13 @@ namespace readrco.src.model
 
 		private string[] AddString(string str, string[] which, ref byte which_count)
 		{
+			Logger.v("book", "add string,str:" + str + ",count:" + which_count);
 			if(str == null || str.Length == 0 || which == null)
 				return null;
 
 			if(which_count < which.Length)
 			{
-				which[author_count] = str;
-				which_count++;
+				which[which_count++] = str;
 				return which;
 			}
 			else
@@ -118,8 +120,7 @@ namespace readrco.src.model
 					tmp[i] = which[i];
 				}
 
-				which_count++;
-				tmp[which_count] = str;
+				tmp[which_count++] = str;
 
 				return tmp;
 			}
@@ -137,7 +138,6 @@ namespace readrco.src.model
 				if(!which[i].Equals(str))
 				{
 					tmp[j++] = which[i];
-					//一路删下去
 				}
 			}
 

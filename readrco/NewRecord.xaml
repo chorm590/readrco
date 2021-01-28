@@ -78,11 +78,17 @@
 
 				<!-- row8 -->
 				<TextBlock Text="起阅日期：" Grid.Row="7" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
-				<TextBox x:Name="TBBeginDate" Grid.Row="7" Grid.Column="1" Margin="0, 5, 0, 0" />
+				<StackPanel Orientation="Horizontal" Grid.Row="7" Grid.Column="1" Margin="0, 5, 0, 0" >
+					<TextBox x:Name="TBBeginDate" Width="160" />
+					<TextBlock Text=" 今天 " Name="TBBD" Background="White" Margin="5, 0, 0, 0" MouseDown="Today_Click" />
+				</StackPanel>
 
 				<!-- row9 -->
 				<TextBlock Text="终读日期：" Grid.Row="8" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
-				<TextBox x:Name="TBEndDate" Grid.Row="8" Grid.Column="1" Margin="0, 5, 0, 0" />
+				<StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="1" Margin="0, 5, 0, 0" >
+					<TextBox x:Name="TBEndDate" Width="160" />
+					<TextBlock Text=" 今天 " Name="TBED" Background="White" Margin="5, 0, 0, 0" MouseDown="Today_Click" />
+				</StackPanel>
 
 				<!-- row10 -->
 				<StackPanel Orientation="Horizontal" Grid.Row="9" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
@@ -134,7 +140,7 @@
 					
 				<!-- row2 -->
 				<TextBlock Text="短评：" Grid.Row="1" HorizontalAlignment="Right" Margin="0, 10, 0, 0" />
-				<TextBox Grid.Row="1" Grid.Column="1" Width="250" Height="40" HorizontalAlignment="Left" MaxWidth="250" TextWrapping="Wrap" Margin="0, 10, 0, 0" />
+				<TextBox x:Name="TBComment" Grid.Row="1" Grid.Column="1" Width="250" Height="40" HorizontalAlignment="Left" MaxWidth="250" TextWrapping="Wrap" Margin="0, 10, 0, 0" />
 			</Grid>
 		</GroupBox>
 
