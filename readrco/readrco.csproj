@@ -17,8 +17,4 @@
     <Resource Include="res\minus.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="src\xml\" />
-  </ItemGroup>
-
 </Project>

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using readrco.src.tool;
+using readrco.src.xml;
 
 namespace readrco
 {
@@ -31,6 +32,11 @@ namespace readrco
 			InitializeComponent();
 			Logger.v(TAG, "hello world");
 
+			if(!XMLManager.Init())
+			{
+				MessageBox.Show("无法初始化读书记录数据文件");
+				Application.Current.Shutdown();
+			}
 		}
 
 		private void Btn_New_Click(object sender, RoutedEventArgs e)
