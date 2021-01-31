@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using readrco.src.model;
 using readrco.src.tool;
 using readrco.src.xml;
 
@@ -32,10 +33,37 @@ namespace readrco
 			InitializeComponent();
 			Logger.v(TAG, "hello world");
 
-			if(!XMLManager.Init())
+			if(XMLManager.Init())
+			{
+				if(XMLManager.LoadRecord())
+				{
+					Logger.v(TAG, "Load record finished, count:" + XMLManager.GetRecords().Count);
+					foreach(Record rco in XMLManager.GetRecords())
+					{
+						Logger.v(TAG, rco.ToString());
+						LVList.Items.Add(rco);
+					}
+				}
+				else
+				{
+					MessageBox.Show("读取记录时发生错误");
+					Application.Current.Shutdown();
+				}
+			}
+			else
 			{
 				MessageBox.Show("无法初始化读书记录数据文件");
 				Application.Current.Shutdown();
+			}
+
+			LVList.MouseDoubleClick += LVList_MouseDoubleClick;
+		}
+
+		private void LVList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if(e.ChangedButton == MouseButton.Left)
+			{
+				Btn_Edit_Click(sender, e);
 			}
 		}
 
@@ -52,7 +80,11 @@ namespace readrco
 
 		private void Btn_Edit_Click(object sender, RoutedEventArgs e)
 		{
-
+			if(LVList.SelectedItem is Record rco)
+			{
+				Logger.v(TAG, "Editing the record of " + rco.Book.MainTitle);
+				//TODO
+			}
 		}
 	}
 }

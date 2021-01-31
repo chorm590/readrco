@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
+using readrco.src.model;
 using readrco.src.tool;
 
 namespace readrco.src.xml
@@ -16,6 +17,7 @@ namespace readrco.src.xml
 		private const string ROOT_NODE_NAME = "readrco";
 
 		private static XmlDocument xml;
+		private static List<Record> records;
 
 		/// <summary>
 		/// 保证记录存储文件的存在且具有正确的根节点。
@@ -86,7 +88,8 @@ namespace readrco.src.xml
 						xml.Load(RECORD_FILE_NAME);
 						Logger.v(TAG, "reload xml file success");
 					}
-					catch(Exception e1) {
+					catch(Exception e1)
+					{
 						Logger.v(TAG, "Unpredictable error occur\n" + e1.StackTrace);
 						return false;
 					}
@@ -94,6 +97,201 @@ namespace readrco.src.xml
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// load record from xml file to memory
+		/// 2021-01-31 17:27
+		/// </summary>
+		internal static bool LoadRecord()
+		{
+			if(xml is null)
+			{
+				Logger.v(TAG, "The 'xml' is null");
+				return false;
+			}
+
+			XmlElement root = xml.DocumentElement;
+			if(root is null)
+			{
+				Logger.v(TAG, "No root node found");
+				return false;
+			}
+
+			records = new List<Record>(50);
+			XmlNode node = root.FirstChild;
+			XmlNode node2;
+			XmlNodeList nodes;
+			XmlNodeList nodes2;
+			Record rco;
+			Book book;
+			while(node != null)
+			{
+				if(!node.Name.Equals(Record.NODE_RECORD_NAME))
+					continue;
+
+				nodes = node.ChildNodes;
+				Logger.v(TAG, "Record child count:" + nodes.Count);
+				if(nodes.Count != 3) //2021-01-31 17:58
+				{
+					continue;
+				}
+
+				rco = new Record();
+				for(byte i = 0; i < 3; i++)
+				{
+					node2 = nodes[i];
+					if(node2 is null)
+					{
+						rco = null;
+						break;
+					}
+
+					Logger.v(TAG, "name:" + node2.Name + ", inner text:" + node2.InnerText);
+					if(node2.Name.Equals(Record.NODE_ID_NAME))
+					{
+						try
+						{
+							int id = int.Parse(node2.InnerText);
+							Logger.v(TAG, "ID:" + id);
+							rco.ID = id;
+						}
+						catch(Exception)
+						{
+							rco = null;
+							break;
+						}
+					}
+					else if(node2.Name.Equals(Record.NODE_BOOK_NAME))
+					{
+						nodes2 = node2.ChildNodes;
+						Logger.v(TAG, "'book' child count:" + nodes2.Count);
+
+						book = new Book();
+						for(byte j = 0; j < nodes2.Count; j++)
+						{
+							switch(nodes2[j].Name)
+							{
+								case Record.NODE_MTITLE_NAME:
+									book.MainTitle = nodes2[j].InnerText;
+									break;
+								case Record.NODE_STITLE_NAME:
+									book.SubTitle = nodes2[j].InnerText;
+									break;
+								case Record.NODE_AUTHORS_NAME:
+									XmlNodeList nodes3 = nodes2[j].ChildNodes;
+									for(byte k = 0; k < nodes3.Count; k++)
+									{
+										book.AddAuthor(nodes3[k].InnerText);
+									}
+									break;
+								case Record.NODE_TRANSLATORS_NAME:
+									XmlNodeList nodes4 = nodes2[j].ChildNodes;
+									for(byte k = 0; k < nodes4.Count; k++)
+									{
+										book.AddTranslator(nodes4[k].InnerText);
+									}
+									break;
+								case Record.NODE_PRESS_NAME:
+									book.Press = nodes2[j].InnerText;
+									break;
+								case Record.NODE_PRESSSN_NAME:
+									book.PressSn = nodes2[j].InnerText;
+									break;
+								case Record.NODE_WORDCOUNT_NAME:
+									try
+									{
+										book.WordCount = float.Parse(nodes2[j].InnerText);
+									}
+									catch(Exception)
+									{
+										Logger.v(TAG, "Invalid word-count found");
+										book = null;
+									}
+									break;
+							} //switch -- end
+
+							if(book is null)
+								break;
+						} //for -- end
+
+						if(book is null)
+						{
+							rco = null;
+							break;
+						}
+						else
+						{
+							rco.Book = book;
+						}
+					}
+					else if(node2.Name.Equals(Record.NODE_RINFO_NAME))
+					{
+						nodes2 = node2.ChildNodes;
+						Logger.v(TAG, "'read-info' child count:" + nodes2.Count);
+						for(byte j = 0; j < nodes2.Count; j++)
+						{
+							switch(nodes2[j].Name)
+							{
+								case Record.NODE_STATUS_NAME:
+									if(nodes2[j].InnerText.Equals("0"))
+									{
+										rco.Status = Record.STATUS_READING;
+									}
+									else
+									{
+										rco.Status = Record.STATUS_READ;
+									}
+									break;
+								case Record.NODE_BEGINDATE_NAME:
+									rco.BeginDate = nodes2[j].InnerText;
+									break;
+								case Record.NODE_ENDDATE_NAME:
+									rco.EndDate = nodes2[j].InnerText;
+									break;
+								case Record.NODE_STAR_NAME:
+									try
+									{
+										rco.Star = byte.Parse(nodes2[j].InnerText);
+									}
+									catch(Exception)
+									{
+										rco = null;
+									}
+									break;
+								case Record.NODE_COMMENT_NAME:
+									rco.Comment = nodes2[j].InnerText;
+									break;
+							} //switch -- end.
+
+							if(rco is null)
+							{
+								break;
+							}
+						} //for -- end
+					}
+					else
+					{
+						Logger.v(TAG, "Invalid node in 'record' found");
+						rco = null;
+						break;
+					}
+				} //for -- end
+
+				if(rco != null)
+				{
+					records.Add(rco);
+				}
+
+				node = node.NextSibling;
+			} //while -- end
+
+			return true;
+		}
+
+		internal static List<Record> GetRecords()
+		{
+			return records;
 		}
 
 		private static bool CreateRootNode()
@@ -104,7 +302,7 @@ namespace readrco.src.xml
 				xml.AppendChild(root);
 				xml.Save(RECORD_FILE_NAME);
 			}
-			catch(Exception e)
+			catch(Exception)
 			{
 				return false;
 			}

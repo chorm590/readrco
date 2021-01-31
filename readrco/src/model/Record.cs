@@ -1,21 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace readrco.src.model
 {
-	internal class Record
+	internal class Record : IComparable, INotifyPropertyChanged
 	{
+		public event PropertyChangedEventHandler PropertyChanged;
+		private readonly PropertyChangedEventArgs pcID;
+		private readonly PropertyChangedEventArgs pcBeginDate;
+		private readonly PropertyChangedEventArgs pcEndDate;
+		private readonly PropertyChangedEventArgs pcStar;
+
 		internal const byte STATUS_READING = 0;
 		internal const byte STATUS_READ = 1;
 
-		internal int ID
+		internal const string NODE_RECORD_NAME = "record";
+		internal const string NODE_ID_NAME = "id";
+		internal const string NODE_BOOK_NAME = "book";
+		internal const string NODE_RINFO_NAME = "read_info";
+		internal const string NODE_MTITLE_NAME = "main_title";
+		internal const string NODE_STITLE_NAME = "sub_title";
+		internal const string NODE_AUTHORS_NAME = "authors";
+		internal const string NODE_AUTHOR_NAME = "author";
+		internal const string NODE_TRANSLATORS_NAME = "translators";
+		internal const string NODE_TRANSLATOR_NAME = "translator";
+		internal const string NODE_PRESS_NAME = "press";
+		internal const string NODE_PRESSSN_NAME = "press_sn";
+		internal const string NODE_WORDCOUNT_NAME = "word_count";
+		internal const string NODE_STATUS_NAME = "status";
+		internal const string NODE_BEGINDATE_NAME = "begin_date";
+		internal const string NODE_ENDDATE_NAME = "end_date";
+		internal const string NODE_STAR_NAME = "star";
+		internal const string NODE_COMMENT_NAME = "comment";
+
+		private int id;
+		private string beginDate;
+		private string endDate;
+		private byte star;
+
+		internal Record()
 		{
-			get;
-			set;
+			pcID = new PropertyChangedEventArgs("ID");
+			pcBeginDate = new PropertyChangedEventArgs("BeginDate");
+			pcEndDate = new PropertyChangedEventArgs("EndDate");
+			pcStar = new PropertyChangedEventArgs("Star");
 		}
 
-		internal Book book
+		public int ID
+		{
+			get
+			{
+				return id;
+			}
+			set
+			{
+				id = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcID);
+				}
+			}
+		}
+
+		public Book Book
 		{
 			get;
 			set;
@@ -27,22 +76,52 @@ namespace readrco.src.model
 			set;
 		}
 
-		internal string BeginDate
+		public string BeginDate
 		{
-			get;
-			set;
+			get
+			{
+				return beginDate;
+			}
+			set
+			{
+				beginDate = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcBeginDate);
+				}
+			}
 		}
 
-		internal string EndDate
+		public string EndDate
 		{
-			get;
-			set;
+			get
+			{
+				return endDate;
+			}
+			set
+			{
+				endDate = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcEndDate);
+				}
+			}
 		}
 
-		internal byte Star
+		public byte Star
 		{
-			get;
-			set;
+			get
+			{
+				return star;
+			}
+			set
+			{
+				star = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcStar);
+				}
+			}
 		}
 
 		internal string Comment
@@ -51,12 +130,32 @@ namespace readrco.src.model
 			set;
 		}
 
+		internal void BookChangedCallback(string name, object value)
+		{
+
+		}
+
 		public override string ToString()
 		{
-			if(book is null)
+			if(this.Book is null)
 				return "";
 
-			return "ID:" + ID + "\nMainTitle:" + book.MainTitle + "\nSubTitle:" + book.SubTitle + "\nStar:" + Star + "\nComment:" + Comment;
+			return "\nID:" + ID + "\nMainTitle:" + this.Book.MainTitle + "\nSubTitle:" + this.Book.SubTitle + "\nStar:" + Star + "\nComment:" + Comment;
+		}
+
+		public int CompareTo(object obj)
+		{
+			if(obj is Record rco)
+			{
+				if(ID > rco.ID)
+					return 1;
+				else if(ID < rco.ID)
+					return -1;
+				else
+					return 0;
+			}
+
+			return 0; //Don't compare
 		}
 	}
 }

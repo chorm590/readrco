@@ -1,16 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 using readrco.src.tool;
 
 namespace readrco.src.model
 {
-	internal class Book
+	internal class Book : INotifyPropertyChanged
 	{
+		public event PropertyChangedEventHandler PropertyChanged;
+		private readonly PropertyChangedEventArgs pcMainTitle;
+		private readonly PropertyChangedEventArgs pcSubTitle;
+
 		private byte author_count;
 		private byte translator_count;
 
+		private string mainTitle;
+		private string subTitle;
 		private string[] authors;
 		private string[] translators;
 
@@ -18,18 +25,40 @@ namespace readrco.src.model
 		{
 			authors = new string[1];
 			translators = new string[1];
+			pcMainTitle = new PropertyChangedEventArgs("MainTitle");
+			pcSubTitle = new PropertyChangedEventArgs("SubTitle");
 		}
 
-		internal string MainTitle
+		public string MainTitle
 		{
-			get;
-			set;
+			get
+			{
+				return mainTitle;
+			}
+			set
+			{
+				mainTitle = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcMainTitle);
+				}
+			}
 		}
 
-		internal string SubTitle
+		public string SubTitle
 		{
-			get;
-			set;
+			get
+			{
+				return subTitle;
+			}
+			set
+			{
+				subTitle = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcSubTitle);
+				}
+			}
 		}
 
 		internal string Press
