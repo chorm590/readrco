@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:readrco"
         mc:Ignorable="d"
 		SizeToContent="Height"
-        Title="NewRecord" Width="450" ResizeMode="CanMinimize">
+        Title="NewRecord" Width="450" ResizeMode="CanMinimize" Loaded="Window_Loaded">
 
 	<Window.Resources>
 		<Style x:Key="NarrowTextBoxWidth" TargetType="TextBox">
@@ -130,7 +130,7 @@
 
 				<!-- row1 -->
 				<TextBlock Text="评分：" Grid.Row="0" HorizontalAlignment="Right" />
-				<ComboBox Name="CBStart" Grid.Column="1" Width="70" HorizontalAlignment="Left" >
+				<ComboBox Name="CBStar" Grid.Column="1" Width="70" HorizontalAlignment="Left" >
 					<ComboBoxItem>1分</ComboBoxItem>
 					<ComboBoxItem>2分</ComboBoxItem>
 					<ComboBoxItem>3分</ComboBoxItem>

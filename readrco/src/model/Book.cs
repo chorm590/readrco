@@ -7,7 +7,7 @@ using readrco.src.tool;
 
 namespace readrco.src.model
 {
-	internal class Book : INotifyPropertyChanged
+	public class Book : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 		private readonly PropertyChangedEventArgs pcMainTitle;
@@ -15,6 +15,8 @@ namespace readrco.src.model
 
 		private byte author_count;
 		private byte translator_count;
+
+		private float? wordCount;
 
 		private string mainTitle;
 		private string subTitle;
@@ -76,10 +78,16 @@ namespace readrco.src.model
 		/// <summary>
 		/// kilo word count
 		/// </summary>
-		internal float WordCount
+		internal float? WordCount
 		{
-			get;
-			set;
+			get
+			{
+				return wordCount;
+			}
+			set
+			{
+				wordCount = value;
+			}
 		}
 
 		internal (string[], byte) GetAuthors()
@@ -108,6 +116,12 @@ namespace readrco.src.model
 			}
 		}
 
+		internal void ClearAuthors()
+		{
+			authors = new string[1];
+			author_count = 0;
+		}
+
 		internal (string[], byte) GetTranslators()
 		{
 			return (translators, translator_count);
@@ -127,6 +141,12 @@ namespace readrco.src.model
 			{
 				translators = tmp;
 			}
+		}
+
+		internal void ClearTranslators()
+		{
+			translators = new string[1];
+			translator_count = 0;
 		}
 
 		private string[] AddString(string str, string[] which, ref byte which_count)

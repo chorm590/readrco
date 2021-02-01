@@ -10,6 +10,7 @@ using System.Xml;
 
 using readrco.src.model;
 using readrco.src.tool;
+using readrco.src.xml;
 
 namespace readrco
 {
@@ -20,8 +21,13 @@ namespace readrco
 	{
 		private const string TAG = "NewRecord";
 
-		public NewRecord()
+		private readonly int curMaxID;
+		private readonly Record record;
+
+		public NewRecord(Record record, int curmax)
 		{
+			this.record = record;
+			curMaxID = curmax;
 			InitializeComponent();
 		}
 
@@ -219,7 +225,7 @@ namespace readrco
 				return;
 			}
 
-			int sidx = CBStart.SelectedIndex;
+			int sidx = CBStar.SelectedIndex;
 			if(!reading)
 			{
 				if(sidx == -1)
@@ -231,24 +237,39 @@ namespace readrco
 
 			(string[] translators, byte translator_count) = GetTranslators();
 			Logger.v(TAG, "translator_count:" + translator_count);
-			Record rco = new Record();
-			rco.ID = 1;
-			
-			if(reading)
-				rco.Status = Record.STATUS_READING;
-			else
-				rco.Status = Record.STATUS_READ;
 
-			rco.Comment = TBComment.Text;
-			rco.BeginDate = TBBeginDate.Text;
-			rco.EndDate = TBEndDate.Text;
-
-			Book book = new Book();
-			book.MainTitle = TBMainTitle.Text;
-			if(TBSubTitle.Text.Length > 0)
+			Record rco;
+			Book book;
+			if(this.record is null)
 			{
-				book.SubTitle = TBSubTitle.Text;
+				rco = new Record();
+				rco.ID = curMaxID + 1;
+				book = new Book();
+				rco.Book = book;
 			}
+			else
+			{
+				rco = this.record;
+				book = this.record.Book;
+				book.ClearAuthors();
+				book.ClearTranslators();
+			}
+
+			if(reading)
+			{
+				rco.Status = Record.STATUS_READING;
+			}
+			else
+			{
+				rco.Status = Record.STATUS_READ;
+				rco.Star = (byte)(CBStar.SelectedIndex + 1);
+				rco.EndDate = TBEndDate.Text;
+				rco.Comment = TBComment.Text;
+			}
+			
+			rco.BeginDate = TBBeginDate.Text;
+			book.MainTitle = TBMainTitle.Text;
+			book.SubTitle = TBSubTitle.Text;
 
 			for(byte i = 0; i < author_count; i++)
 			{
@@ -260,37 +281,24 @@ namespace readrco
 				book.AddTranslator(translators[i]);
 			}
 
-			if(TBPublish.Text.Length > 0)
-			{
-				book.Press = TBPublish.Text;
-			}
-
-			if(TBPubSn.Text.Length > 0)
-			{
-				book.PressSn = TBPubSn.Text;
-			}
-
+			book.Press = TBPublish.Text;
+			book.PressSn = TBPubSn.Text;
 			if(TBWords.Text.Length > 0)
 			{
-				book.WordCount = int.Parse(TBWords.Text);
+				float? wc;
+				try
+				{
+					wc = float.Parse(TBWords.Text);
+				}
+				catch(Exception)
+				{
+					wc = null;
+				}
+
+				book.WordCount = wc;
 			}
-			
-			XmlDocument xml = new XmlDocument();
-			xml.Load("records.xml");
-			XmlElement root = xml.DocumentElement;
-			XmlElement record = xml.CreateElement("record");
-			XmlElement id = xml.CreateElement("id");
-			XmlText tid = xml.CreateTextNode(rco.ID.ToString());
-			id.AppendChild(tid);
-			XmlElement bookk = xml.CreateElement("book");
-			XmlElement mainTitle = xml.CreateElement("main_title");
-			XmlText tmt = xml.CreateTextNode(book.MainTitle);
-			mainTitle.AppendChild(tmt);
-			bookk.AppendChild(mainTitle);
-			record.AppendChild(id);
-			record.AppendChild(bookk);
-			root.AppendChild(record);
-			xml.Save("records.xml");
+
+			StorageRecord(rco);
 		}
 
 		private (string[], byte) GetPersons(StackPanel panel)
@@ -324,6 +332,192 @@ namespace readrco
 		private (string[], byte) GetTranslators()
 		{
 			return GetPersons(SPTranslators);
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			if(record != null)
+			{
+				TBMainTitle.Text = record.Book.MainTitle;
+				TBSubTitle.Text = record.Book.SubTitle;
+				TBPublish.Text = record.Book.Press;
+				TBPubSn.Text = record.Book.PressSn;
+				float? wc = record.Book.WordCount;
+				if(wc is null)
+					TBWords.Text = "";
+				else
+					TBWords.Text = wc.Value.ToString();
+				TBBeginDate.Text = record.BeginDate;
+				TBEndDate.Text = record.EndDate;
+				if(record.Status == Record.STATUS_READ)
+				{
+					RBRead.IsChecked = true;
+					byte? star = record.Star;
+					if(star is null)
+						CBStar.SelectedIndex = -1;
+					else
+						CBStar.SelectedIndex = star.Value - 1;
+					TBComment.Text = record.Comment;
+				}
+				else
+				{
+					RBReading.IsChecked = true;
+					CBStar.SelectedIndex = 4;
+					TBComment.Text = "";
+				}
+
+				//author apply
+				(string[] authors, byte author_count) = record.Book.GetAuthors();
+				if(author_count > 0)
+				{
+					//The first element
+					((TextBox)((StackPanel)(SPAuthors.Children[0])).Children[0]).Text = authors[0];
+					if(author_count > 1)
+					{
+						StackPanel panel;
+						for(byte i = 1; i < author_count; i++)
+						{
+							panel = GenRemovableTextBox(SPAuthors);
+							((TextBox)(panel.Children[0])).Text = authors[i];
+							SPAuthors.Children.Add(panel);
+						}
+					}
+				}
+
+				//translator apply
+				(string[] translators, byte translator_count) = record.Book.GetTranslators();
+				if(translator_count > 0)
+				{
+					((TextBox)((StackPanel)(SPTranslators.Children[0])).Children[0]).Text = translators[0];
+					if(translator_count > 1)
+					{
+						StackPanel panel;
+						for(byte i = 1; i < translator_count; i++)
+						{
+							panel = GenRemovableTextBox(SPTranslators);
+							((TextBox)(panel.Children[0])).Text = translators[i];
+							SPTranslators.Children.Add(panel);
+						}
+					}
+				}
+			}
+			else
+			{
+				//默认值加载。
+				CBStar.SelectedIndex = 4; //默认满分评分。
+			}
+		}
+
+		private void StorageRecord(Record rco)
+		{
+			if(this.record is null)
+			{
+				//New record
+				XmlElement node = XMLManager.GetNewElement(Record.NODE_RECORD_NAME);
+				XmlText xmltxt;
+
+				//part 1
+				XmlElement id = XMLManager.GetNewElement(Record.NODE_ID_NAME);
+				xmltxt = XMLManager.GetNewTextNode(rco.ID.ToString());
+				id.AppendChild(xmltxt);
+
+				//part 2
+				XmlElement book = XMLManager.GetNewElement(Record.NODE_BOOK_NAME);
+				XmlElement mainTitle = XMLManager.GetNewElement(Record.NODE_MTITLE_NAME);
+				xmltxt = XMLManager.GetNewTextNode(rco.Book.MainTitle);
+				mainTitle.AppendChild(xmltxt);
+				book.AppendChild(mainTitle);
+				if(rco.Book.SubTitle.Length > 0)
+				{
+					XmlElement subTitle = XMLManager.GetNewElement(Record.NODE_STITLE_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.Book.SubTitle);
+					subTitle.AppendChild(xmltxt);
+					book.AppendChild(subTitle);
+				}
+				XmlElement authors = XMLManager.GetNewElement(Record.NODE_AUTHORS_NAME);
+				(string[] authorstr, byte author_count) = rco.Book.GetAuthors();
+				for(byte i = 0; i < author_count; i++)
+				{
+					XmlElement author = XMLManager.GetNewElement(Record.NODE_AUTHOR_NAME);
+					xmltxt = XMLManager.GetNewTextNode(authorstr[i]);
+					author.AppendChild(xmltxt);
+
+					authors.AppendChild(author);
+				}
+				book.AppendChild(authors);
+				(string[] translatorstr, byte translator_count) = rco.Book.GetTranslators();
+				if(translator_count > 0)
+				{
+					XmlElement translators = XMLManager.GetNewElement(Record.NODE_TRANSLATORS_NAME);
+					for(byte i = 0; i < translator_count; i++)
+					{
+						XmlElement translator = XMLManager.GetNewElement(Record.NODE_TRANSLATOR_NAME);
+						xmltxt = XMLManager.GetNewTextNode(translatorstr[i]);
+						translator.AppendChild(xmltxt);
+
+						translators.AppendChild(translator);
+					}
+					book.AppendChild(translators);
+				}
+				if(rco.Book.Press.Length > 0)
+				{
+					XmlElement press = XMLManager.GetNewElement(Record.NODE_PRESS_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.Book.Press);
+					press.AppendChild(xmltxt);
+					book.AppendChild(press);
+				}
+				if(rco.Book.PressSn.Length > 0)
+				{
+					XmlElement pressSn = XMLManager.GetNewElement(Record.NODE_PRESSSN_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.Book.PressSn);
+					pressSn.AppendChild(xmltxt);
+					book.AppendChild(pressSn);
+				}
+				if(rco.Book.WordCount > 0)
+				{
+					XmlElement wc = XMLManager.GetNewElement(Record.NODE_WORDCOUNT_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.Book.WordCount.ToString());
+					wc.AppendChild(xmltxt);
+					book.AppendChild(wc);
+				}
+
+				//part 3
+				XmlElement readinfo = XMLManager.GetNewElement(Record.NODE_RINFO_NAME);
+				XmlElement status = XMLManager.GetNewElement(Record.NODE_STATUS_NAME);
+				xmltxt = XMLManager.GetNewTextNode(rco.Status.ToString());
+				status.AppendChild(xmltxt);
+				readinfo.AppendChild(status);
+				XmlElement bdate = XMLManager.GetNewElement(Record.NODE_BEGINDATE_NAME);
+				xmltxt = XMLManager.GetNewTextNode(rco.BeginDate);
+				bdate.AppendChild(xmltxt);
+				readinfo.AppendChild(bdate);
+				if(rco.Status == Record.STATUS_READ)
+				{
+					XmlElement edate = XMLManager.GetNewElement(Record.NODE_ENDDATE_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.EndDate);
+					edate.AppendChild(xmltxt);
+					XmlElement star = XMLManager.GetNewElement(Record.NODE_STAR_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.Star.ToString());
+					star.AppendChild(xmltxt);
+					XmlElement comment = XMLManager.GetNewElement(Record.NODE_COMMENT_NAME);
+					xmltxt = XMLManager.GetNewTextNode(rco.Comment);
+					comment.AppendChild(xmltxt);
+					readinfo.AppendChild(edate);
+					readinfo.AppendChild(star);
+					readinfo.AppendChild(comment);
+				}
+
+				node.AppendChild(id);
+				node.AppendChild(book);
+				node.AppendChild(readinfo);
+
+				//Insert to the head
+				XMLManager.InsertRecord(node);
+			}
+			else
+			{
+				
+			}
 		}
 	}
 }

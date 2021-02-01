@@ -5,7 +5,7 @@ using System.Text;
 
 namespace readrco.src.model
 {
-	internal class Record : IComparable, INotifyPropertyChanged
+	public class Record : IComparable, INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 		private readonly PropertyChangedEventArgs pcID;
@@ -38,7 +38,7 @@ namespace readrco.src.model
 		private int id;
 		private string beginDate;
 		private string endDate;
-		private byte star;
+		private byte? star;
 
 		internal Record()
 		{
@@ -108,11 +108,14 @@ namespace readrco.src.model
 			}
 		}
 
-		public byte Star
+		public byte? Star
 		{
 			get
 			{
-				return star;
+				if(star is null)
+					return null;
+				else
+					return star.Value;
 			}
 			set
 			{

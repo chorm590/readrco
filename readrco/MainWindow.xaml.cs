@@ -74,7 +74,7 @@ namespace readrco
 				newRecordWindow.Close();
 			}
 
-			newRecordWindow = new NewRecord();
+			newRecordWindow = new NewRecord(null, GetCurMaxID());
 			newRecordWindow.Show();
 		}
 
@@ -83,8 +83,27 @@ namespace readrco
 			if(LVList.SelectedItem is Record rco)
 			{
 				Logger.v(TAG, "Editing the record of " + rco.Book.MainTitle);
-				//TODO
+				if(newRecordWindow != null)
+				{
+					newRecordWindow.Close();
+				}
+
+				newRecordWindow = new NewRecord(rco, GetCurMaxID());
+				newRecordWindow.Show();
 			}
+		}
+
+		private int GetCurMaxID()
+		{
+			int max = 0;
+			List<Record> records = XMLManager.GetRecords();
+			for(int i = 0; i < records.Count; i++)
+			{
+				if(max < records[i].ID)
+					max = records[i].ID;
+			}
+
+			return max;
 		}
 	}
 }

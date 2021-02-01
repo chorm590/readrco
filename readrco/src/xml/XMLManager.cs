@@ -294,6 +294,36 @@ namespace readrco.src.xml
 			return records;
 		}
 
+		internal static void InsertRecord(XmlNode node)
+		{
+			if(xml is null)
+				return;
+
+			XmlElement root = xml.DocumentElement;
+			if(root is null)
+				return;
+
+			root.InsertBefore(node, root.FirstChild);
+			xml.Save(RECORD_FILE_NAME);
+			Logger.v(TAG, "storaged");
+		}
+
+		internal static XmlElement GetNewElement(string name)
+		{
+			if(xml is null)
+				return null;
+
+			return xml.CreateElement(name);
+		}
+
+		internal static XmlText GetNewTextNode(string value)
+		{
+			if(xml is null)
+				return null;
+
+			return xml.CreateTextNode(value);
+		}
+
 		private static bool CreateRootNode()
 		{
 			XmlElement root = xml.CreateElement(ROOT_NODE_NAME);
