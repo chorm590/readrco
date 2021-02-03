@@ -1,17 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 using readrco.src.model;
 using readrco.src.tool;
@@ -71,10 +61,12 @@ namespace readrco
 		{
 			if(newRecordWindow != null)
 			{
+				newRecordWindow.Closed -= RecordEditWindowClosed;
 				newRecordWindow.Close();
 			}
 
 			newRecordWindow = new NewRecord(null, GetCurMaxID());
+			newRecordWindow.Closed += RecordEditWindowClosed;
 			newRecordWindow.Show();
 		}
 
@@ -85,10 +77,12 @@ namespace readrco
 				Logger.v(TAG, "Editing the record of " + rco.Book.MainTitle);
 				if(newRecordWindow != null)
 				{
+					newRecordWindow.Closed -= RecordEditWindowClosed;
 					newRecordWindow.Close();
 				}
 
 				newRecordWindow = new NewRecord(rco, GetCurMaxID());
+				newRecordWindow.Closed += RecordEditWindowClosed;
 				newRecordWindow.Show();
 			}
 		}
@@ -104,6 +98,20 @@ namespace readrco
 			}
 
 			return max;
+		}
+
+		private void RecordEditWindowClosed(object? sender, EventArgs e)
+		{
+			if(newRecordWindow.rcoStoraged != null)
+			{
+				if(newRecordWindow.rcoStoraged.ID > ((Record)LVList.Items[0]).ID)
+				{
+					XMLManager.InsertRecord(0, newRecordWindow.rcoStoraged);
+					LVList.Items.Insert(0, newRecordWindow.rcoStoraged);
+				}
+			}
+
+			newRecordWindow = null;
 		}
 	}
 }

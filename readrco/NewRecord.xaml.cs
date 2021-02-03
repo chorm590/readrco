@@ -1,6 +1,4 @@
 ﻿using System;
-using System.DirectoryServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -23,6 +21,7 @@ namespace readrco
 
 		private readonly int curMaxID;
 		private readonly Record record;
+		internal Record rcoStoraged;
 
 		public NewRecord(Record record, int curmax)
 		{
@@ -235,6 +234,22 @@ namespace readrco
 				}
 			}
 
+			if(TBWords.Text.Length > 0)
+			{
+				char[] words = TBWords.Text.ToCharArray();
+				foreach(char word in words)
+				{
+					if(word < '0' || word > '9')
+					{
+						if(word != '.')
+						{
+							MessageBox.Show("\"字数\"只能输入数字");
+							return;
+						}
+					}
+				}
+			}
+
 			(string[] translators, byte translator_count) = GetTranslators();
 			Logger.v(TAG, "translator_count:" + translator_count);
 
@@ -258,6 +273,9 @@ namespace readrco
 			if(reading)
 			{
 				rco.Status = Record.STATUS_READING;
+				rco.Star = null;
+				rco.EndDate = "";
+				rco.Comment = "";
 			}
 			else
 			{
@@ -283,20 +301,7 @@ namespace readrco
 
 			book.Press = TBPublish.Text;
 			book.PressSn = TBPubSn.Text;
-			if(TBWords.Text.Length > 0)
-			{
-				float? wc;
-				try
-				{
-					wc = float.Parse(TBWords.Text);
-				}
-				catch(Exception)
-				{
-					wc = null;
-				}
-
-				book.WordCount = wc;
-			}
+			book.WordCount = TBWords.Text;
 
 			StorageRecord(rco);
 		}
@@ -342,11 +347,7 @@ namespace readrco
 				TBSubTitle.Text = record.Book.SubTitle;
 				TBPublish.Text = record.Book.Press;
 				TBPubSn.Text = record.Book.PressSn;
-				float? wc = record.Book.WordCount;
-				if(wc is null)
-					TBWords.Text = "";
-				else
-					TBWords.Text = wc.Value.ToString();
+				TBWords.Text = record.Book.WordCount;
 				TBBeginDate.Text = record.BeginDate;
 				TBEndDate.Text = record.EndDate;
 				if(record.Status == Record.STATUS_READ)
@@ -422,6 +423,7 @@ namespace readrco
 				if(XMLManager.InsertRecord(node))
 				{
 					MessageBox.Show("保存成功");
+					rcoStoraged = rco;
 					Close();
 				}
 				else
@@ -435,6 +437,7 @@ namespace readrco
 				if(XMLManager.ModifyRecord(node, rco.ID.ToString()))
 				{
 					MessageBox.Show("保存成功");
+					rcoStoraged = rco;
 					Close();
 				}
 				else

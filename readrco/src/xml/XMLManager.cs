@@ -199,15 +199,7 @@ namespace readrco.src.xml
 									book.PressSn = nodes2[j].InnerText;
 									break;
 								case Record.NODE_WORDCOUNT_NAME:
-									try
-									{
-										book.WordCount = float.Parse(nodes2[j].InnerText);
-									}
-									catch(Exception)
-									{
-										Logger.v(TAG, "Invalid word-count found");
-										book = null;
-									}
+									book.WordCount = nodes2[j].InnerText;
 									break;
 							} //switch -- end
 
@@ -278,7 +270,7 @@ namespace readrco.src.xml
 					}
 				} //for -- end
 
-				if(rco != null)
+				if(!IsRecordExisted(rco))
 				{
 					records.Add(rco);
 				}
@@ -292,6 +284,28 @@ namespace readrco.src.xml
 		internal static List<Record> GetRecords()
 		{
 			return records;
+		}
+
+		internal static void InsertRecord(int idx, Record rco)
+		{
+			if(!IsRecordExisted(rco))
+			{
+				records.Insert(idx, rco);
+			}
+		}
+
+		private static bool IsRecordExisted(Record rco)
+		{
+			if(rco is null || records is null)
+				return true;
+
+			foreach(Record rco2 in records)
+			{
+				if(rco2.ID == rco.ID)
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -364,7 +378,7 @@ namespace readrco.src.xml
 				pressSn.AppendChild(xmltxt);
 				book.AppendChild(pressSn);
 			}
-			if(rco.Book.WordCount > 0)
+			if(rco.Book.WordCount != null && rco.Book.WordCount.Length > 0)
 			{
 				XmlElement wc = xml.CreateElement(Record.NODE_WORDCOUNT_NAME);
 				xmltxt = xml.CreateTextNode(rco.Book.WordCount.ToString());

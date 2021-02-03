@@ -11,6 +11,7 @@ namespace readrco.src.model
 		private readonly PropertyChangedEventArgs pcID;
 		private readonly PropertyChangedEventArgs pcBeginDate;
 		private readonly PropertyChangedEventArgs pcEndDate;
+		private readonly PropertyChangedEventArgs pcStatus;
 		private readonly PropertyChangedEventArgs pcStar;
 
 		internal const byte STATUS_READING = 0;
@@ -38,6 +39,7 @@ namespace readrco.src.model
 		private int id;
 		private string beginDate;
 		private string endDate;
+		private byte status;
 		private byte? star;
 
 		internal Record()
@@ -45,6 +47,7 @@ namespace readrco.src.model
 			pcID = new PropertyChangedEventArgs("ID");
 			pcBeginDate = new PropertyChangedEventArgs("BeginDate");
 			pcEndDate = new PropertyChangedEventArgs("EndDate");
+			pcStatus = new PropertyChangedEventArgs("Status");
 			pcStar = new PropertyChangedEventArgs("Star");
 		}
 
@@ -70,10 +73,20 @@ namespace readrco.src.model
 			set;
 		}
 
-	    internal byte Status
+	    public byte Status
 		{
-			get;
-			set;
+			get
+			{
+				return status;
+			}
+			set
+			{
+				status = value;
+				if(PropertyChanged != null)
+				{
+					PropertyChanged.Invoke(this, pcStatus);
+				}
+			}
 		}
 
 		public string BeginDate

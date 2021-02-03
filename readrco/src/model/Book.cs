@@ -16,8 +16,6 @@ namespace readrco.src.model
 		private byte author_count;
 		private byte translator_count;
 
-		private float? wordCount;
-
 		private string mainTitle;
 		private string subTitle;
 		private string[] authors;
@@ -78,16 +76,10 @@ namespace readrco.src.model
 		/// <summary>
 		/// kilo word count
 		/// </summary>
-		internal float? WordCount
+		internal string WordCount
 		{
-			get
-			{
-				return wordCount;
-			}
-			set
-			{
-				wordCount = value;
-			}
+			get;
+			set;
 		}
 
 		internal (string[], byte) GetAuthors()

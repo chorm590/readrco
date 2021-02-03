@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:readrco"
         mc:Ignorable="d"
 		SizeToContent="Height"
-        Title="NewRecord" Width="450" ResizeMode="CanMinimize" Loaded="Window_Loaded">
+        Title="NewRecord" Width="450" ResizeMode="CanMinimize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
 
 	<Window.Resources>
 		<Style x:Key="NarrowTextBoxWidth" TargetType="TextBox">
@@ -72,7 +72,7 @@
 				<!-- row7 -->
 				<TextBlock Text="字数：" Grid.Row="6" HorizontalAlignment="Right" Margin="0, 5, 0, 0" />
 				<StackPanel Grid.Row="6" Grid.Column="1" Margin="0, 5, 0, 0" Orientation="Horizontal" >
-					<TextBox x:Name="TBWords" InputScope="Number" Style="{StaticResource NarrowTextBoxWidth}" HorizontalAlignment="Left" />
+					<TextBox x:Name="TBWords" Style="{StaticResource NarrowTextBoxWidth}" HorizontalAlignment="Left" />
 					<TextBlock Text=" (千字)" FontSize="11" VerticalAlignment="Center" />
 				</StackPanel>
 
