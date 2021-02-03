@@ -104,7 +104,15 @@ namespace readrco
 		{
 			if(newRecordWindow.rcoStoraged != null)
 			{
-				if(newRecordWindow.rcoStoraged.ID > ((Record)LVList.Items[0]).ID)
+				if(LVList.Items.Count > 0)
+				{
+					if(newRecordWindow.rcoStoraged.ID > ((Record)LVList.Items[0]).ID)
+					{
+						XMLManager.InsertRecord(0, newRecordWindow.rcoStoraged);
+						LVList.Items.Insert(0, newRecordWindow.rcoStoraged);
+					}
+				}
+				else
 				{
 					XMLManager.InsertRecord(0, newRecordWindow.rcoStoraged);
 					LVList.Items.Insert(0, newRecordWindow.rcoStoraged);
