@@ -410,113 +410,37 @@ namespace readrco
 
 		private void StorageRecord(Record rco)
 		{
+			XmlNode node = XMLManager.GenRecordNode(rco);
+			if(node is null)
+			{
+				return;
+			}
+
 			if(this.record is null)
 			{
 				//New record
-				XmlElement node = XMLManager.GetNewElement(Record.NODE_RECORD_NAME);
-				XmlText xmltxt;
-
-				//part 1
-				XmlElement id = XMLManager.GetNewElement(Record.NODE_ID_NAME);
-				xmltxt = XMLManager.GetNewTextNode(rco.ID.ToString());
-				id.AppendChild(xmltxt);
-
-				//part 2
-				XmlElement book = XMLManager.GetNewElement(Record.NODE_BOOK_NAME);
-				XmlElement mainTitle = XMLManager.GetNewElement(Record.NODE_MTITLE_NAME);
-				xmltxt = XMLManager.GetNewTextNode(rco.Book.MainTitle);
-				mainTitle.AppendChild(xmltxt);
-				book.AppendChild(mainTitle);
-				if(rco.Book.SubTitle.Length > 0)
+				if(XMLManager.InsertRecord(node))
 				{
-					XmlElement subTitle = XMLManager.GetNewElement(Record.NODE_STITLE_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.Book.SubTitle);
-					subTitle.AppendChild(xmltxt);
-					book.AppendChild(subTitle);
+					MessageBox.Show("保存成功");
+					Close();
 				}
-				XmlElement authors = XMLManager.GetNewElement(Record.NODE_AUTHORS_NAME);
-				(string[] authorstr, byte author_count) = rco.Book.GetAuthors();
-				for(byte i = 0; i < author_count; i++)
+				else
 				{
-					XmlElement author = XMLManager.GetNewElement(Record.NODE_AUTHOR_NAME);
-					xmltxt = XMLManager.GetNewTextNode(authorstr[i]);
-					author.AppendChild(xmltxt);
-
-					authors.AppendChild(author);
+					MessageBox.Show("保存失败");
 				}
-				book.AppendChild(authors);
-				(string[] translatorstr, byte translator_count) = rco.Book.GetTranslators();
-				if(translator_count > 0)
-				{
-					XmlElement translators = XMLManager.GetNewElement(Record.NODE_TRANSLATORS_NAME);
-					for(byte i = 0; i < translator_count; i++)
-					{
-						XmlElement translator = XMLManager.GetNewElement(Record.NODE_TRANSLATOR_NAME);
-						xmltxt = XMLManager.GetNewTextNode(translatorstr[i]);
-						translator.AppendChild(xmltxt);
-
-						translators.AppendChild(translator);
-					}
-					book.AppendChild(translators);
-				}
-				if(rco.Book.Press.Length > 0)
-				{
-					XmlElement press = XMLManager.GetNewElement(Record.NODE_PRESS_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.Book.Press);
-					press.AppendChild(xmltxt);
-					book.AppendChild(press);
-				}
-				if(rco.Book.PressSn.Length > 0)
-				{
-					XmlElement pressSn = XMLManager.GetNewElement(Record.NODE_PRESSSN_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.Book.PressSn);
-					pressSn.AppendChild(xmltxt);
-					book.AppendChild(pressSn);
-				}
-				if(rco.Book.WordCount > 0)
-				{
-					XmlElement wc = XMLManager.GetNewElement(Record.NODE_WORDCOUNT_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.Book.WordCount.ToString());
-					wc.AppendChild(xmltxt);
-					book.AppendChild(wc);
-				}
-
-				//part 3
-				XmlElement readinfo = XMLManager.GetNewElement(Record.NODE_RINFO_NAME);
-				XmlElement status = XMLManager.GetNewElement(Record.NODE_STATUS_NAME);
-				xmltxt = XMLManager.GetNewTextNode(rco.Status.ToString());
-				status.AppendChild(xmltxt);
-				readinfo.AppendChild(status);
-				XmlElement bdate = XMLManager.GetNewElement(Record.NODE_BEGINDATE_NAME);
-				xmltxt = XMLManager.GetNewTextNode(rco.BeginDate);
-				bdate.AppendChild(xmltxt);
-				readinfo.AppendChild(bdate);
-				if(rco.Status == Record.STATUS_READ)
-				{
-					XmlElement edate = XMLManager.GetNewElement(Record.NODE_ENDDATE_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.EndDate);
-					edate.AppendChild(xmltxt);
-					XmlElement star = XMLManager.GetNewElement(Record.NODE_STAR_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.Star.ToString());
-					star.AppendChild(xmltxt);
-					XmlElement comment = XMLManager.GetNewElement(Record.NODE_COMMENT_NAME);
-					xmltxt = XMLManager.GetNewTextNode(rco.Comment);
-					comment.AppendChild(xmltxt);
-					readinfo.AppendChild(edate);
-					readinfo.AppendChild(star);
-					readinfo.AppendChild(comment);
-				}
-
-				node.AppendChild(id);
-				node.AppendChild(book);
-				node.AppendChild(readinfo);
-
-				//Insert to the head
-				XMLManager.InsertRecord(node);
 			}
 			else
 			{
-				
+				//Modify existing record
+				if(XMLManager.ModifyRecord(node, rco.ID.ToString()))
+				{
+					MessageBox.Show("保存成功");
+					Close();
+				}
+				else
+				{
+					MessageBox.Show("保存失败");
+				}
 			}
 		}
 	}
